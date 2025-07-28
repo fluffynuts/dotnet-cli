@@ -1,0 +1,34 @@
+name: Tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+# I've avoided matrix here because it looks
+# like the parallel jobs don't run in isolation
+# and then they interfere with each other
+jobs:
+  test-node20:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build and test
+        run: |
+          npm ci
+          npm test
+  test-node22:
+    needs: [test-node20]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and test
+        run: |
+          npm ci
+          npm test
