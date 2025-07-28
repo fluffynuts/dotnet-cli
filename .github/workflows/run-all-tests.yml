@@ -9,26 +9,39 @@ on:
 # like the parallel jobs don't run in isolation
 # and then they interfere with each other
 jobs:
-  test-node20:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: Setup .NET for integration testing
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: |
+            7.0.306
+
+      - name: 🟢 Setup NodeJS
+        uses: actions/setup-node@v2-beta
         with:
           node-version: '20'
-      - name: Build and test
+
+      - name: ⬆️ Fetch latest software lists
         run: |
-          npm ci
-          npm test
-  test-node22:
-    needs: [test-node20]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Build and test
+          sudo apt update -q
+
+      - name: 🟥 Setup Redis for test locks
         run: |
-          npm ci
+          sudo apt install redis-server -q
+
+      - name: Test
+        env:
+          SUPPRESS_DOWNLOAD_PROGRESS: 1
+          RUNNING_IN_GITHUB_ACTION: 1
+          TEST_TIMEOUT: 60000
+          MAX_WORKERS: 1
+        run: |
+          npm i
+          npm run build
           npm test
