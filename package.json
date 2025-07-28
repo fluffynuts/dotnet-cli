@@ -1,0 +1,55 @@
+{
+  "name": "dotnet-cli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "clean-dist": "rimraf dist",
+    "generate-index": "node generate-index.js",
+    "prebuild": "run-p clean-dist generate-index",
+    "build": "tsc",
+    "lint": "tslint -p .",
+    "pretest": "rimraf .jest-cache",
+    "zarro": "zarro",
+    "prerelease": "run-s build lint test",
+    "release": "cross-env VERSION_INCREMENT_STRATEGY=minor run-s \"zarro release-npm\"",
+    "prerelease-beta": "run-s build lint test",
+    "release-beta": "cross-env BETA=1 VERSION_INCREMENT_STRATEGY=patch run-s \"zarro release-npm\""
+  },
+  "keywords": [],
+  "author": {
+    "name": "Davyd McColl",
+    "email": "davydm@gmail.com"
+  },
+  "license": "BSD-3-Clause",
+  "description": "provides wrappers around the common functions provided by the dotnet cli\"",
+  "files": [
+    "dist/**/*",
+    "index.js",
+    "index.d.ts"
+  ],
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "@faker-js/faker": "^9.9.0",
+    "@types/debug": "^4.1.12",
+    "@types/jest": "^30.0.0",
+    "babel-jest": "^30.0.5",
+    "cross-env": "^10.0.0",
+    "expect-even-more-jest": "^1.19.0",
+    "ioredis": "^5.6.1",
+    "jest": "^30.0.5",
+    "npm-run-all": "^4.1.5",
+    "redlock": "^5.0.0-beta.2",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.4.0",
+    "tslint": "^5.20.1",
+    "typescript": "^5.8.3",
+    "yafs": "^1.42.0",
+    "zarro": "^1.199.0"
+  },
+  "dependencies": {
+    "debug": "^4.4.1",
+    "exec-step": "^0.17.0",
+    "system-wrapper": "^1.6.0"
+  }
+}
