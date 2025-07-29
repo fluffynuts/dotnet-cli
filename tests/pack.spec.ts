@@ -280,6 +280,7 @@ describe(`dotnet-cli:pack`, () => {
     interface RecordedCall {
       method: string;
       args: any[];
+      stack: string;
     }
 
     it(`should modify the version in the nuspec file during packing, when versionSuffix is provided`, async () => {
@@ -298,17 +299,23 @@ describe(`dotnet-cli:pack`, () => {
         calls = [] as RecordedCall[];
       updateNuspecVersionPre.mockImplementation(
         (fileOrXml: string, newVersion: string) => {
+          let stack = "";
+          try { throw new Error("find stack"); } catch (e: any) { stack = e.stack }
           calls.push({
             method: "updateNuspecVersion",
-            args: [ fileOrXml, newVersion ]
+            args: [ fileOrXml, newVersion ],
+            stack
           });
         }
       );
       systemPre.mockImplementation(
         (exe: string, args: string[], opts: SystemOptions) => {
+          let stack = "";
+          try { throw new Error("find stack"); } catch (e: any) { stack = e.stack }
           calls.push({
             method: "system",
-            args: [ exe, args, opts ]
+            args: [ exe, args, opts ],
+            stack
           });
         });
       // Act

@@ -91,6 +91,30 @@ export interface DotNetRunProjectOptions
     args?: string[];
 }
 
+export interface DotNetRestoreOptions {
+    target: string;
+    disableBuildServers?: boolean;
+    source?: string;
+    packages?: string;
+    useCurrentRuntime?: boolean;
+    disableParallel?: boolean;
+    configFile?: string;
+    noHttpCache?: boolean;
+    ignoreFailedSources?: boolean;
+    force?: boolean;
+    runtime?: string;
+    noDependencies?: boolean;
+    verbosity?: DotNetVerbosity;
+    // TODO: can interactive mode be handled well?
+    // interactive?: boolean;
+    artifactsPath?: string;
+    useLockFile?: boolean;
+    lockedMode?: boolean;
+    lockFilePath?: string;
+    forceEvaluate?: boolean;
+    arch?: string;
+}
+
 export interface DotNetNugetPushOptions
     extends DotNetMsBuildOptionsWithTargetAndConfigurations {
     apiKey?: string;
@@ -228,7 +252,17 @@ enum DotNetCache {
     temp = "temp"
 }
 
-export type DotNetVerbosity = "q" | "quiet" | "m" | "minimal" | "n" | "normal" | "d" | "detailed" | "diag" | "diagnostic";
+export type DotNetVerbosity =
+    "q"
+    | "quiet"
+    | "m"
+    | "minimal"
+    | "n"
+    | "normal"
+    | "d"
+    | "detailed"
+    | "diag"
+    | "diagnostic";
 
 export type DotNetTestLoggers = Dictionary<Dictionary<string>>;
 

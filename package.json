@@ -33,6 +33,7 @@
     "@faker-js/faker": "^9.9.0",
     "@types/debug": "^4.1.12",
     "@types/jest": "^30.0.0",
+    "@types/which": "^3.0.4",
     "babel-jest": "^30.0.5",
     "cross-env": "^10.0.0",
     "expect-even-more-jest": "^1.19.0",
@@ -51,6 +52,7 @@
   "dependencies": {
     "debug": "^4.4.1",
     "exec-step": "^0.17.0",
-    "system-wrapper": "^1.7.0"
+    "system-wrapper": "^1.7.0",
+    "which": "^5.0.0"
   }
 }

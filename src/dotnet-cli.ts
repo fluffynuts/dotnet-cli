@@ -8,6 +8,7 @@ import {
     type Optional,
     type Dictionary
 } from "system-wrapper";
+import which from "which";
 import { types } from "util";
 import { debug as debugFactory } from "debug";
 import * as path from "path";
@@ -38,7 +39,7 @@ import type {
     DotNetPackageReference,
     DotNetPackOptions,
     DotNetPublishContainerOptions,
-    DotNetPublishOptions, DotNetRunProjectOptions, DotNetSearchPackagesOptions,
+    DotNetPublishOptions, DotNetRestoreOptions, DotNetRunProjectOptions, DotNetSearchPackagesOptions,
     DotNetTestLoggers,
     DotNetTestOptions, DotNetUpgradePackagesOptions,
     NugetAddSourceOptions,
@@ -593,7 +594,6 @@ export async function pack(
             pushFlag(args, copy.includeSource, "--include-source");
             pushNoRestore(args, copy);
             let revert = undefined as Optional<RevertVersion>;
-
             try {
                 if (opts.nuspec && await shouldIncludeNuspec(copy)) {
                     const absoluteNuspecPath = await resolveAbsoluteNuspecPath(opts);
@@ -621,7 +621,7 @@ WARNING: 'dotnet pack' ignores --version-suffix when a nuspec file is provided.
                 }
                 pushMsbuildProperties(args, copy);
                 pushAdditionalArgs(args, copy);
-                return runDotNetWith(args, copy);
+                return await runDotNetWith(args, copy);
             } catch (e) {
                 throw e;
             } finally {
@@ -1033,6 +1033,7 @@ async function runDotNetWith(
     args: string[],
     opts?: DotNetBaseOptions
 ): Promise<SystemResult> {
+    await verifyDotnet();
     opts = opts || {};
     if (opts.suppressOutput === undefined) {
         opts.suppressOutput = true;
@@ -1653,7 +1654,10 @@ function verifyNonEmptyString(
     value: string | undefined | null,
     failMessage: string
 ) {
-    if (!`${value}`.trim()) {
+    const isNotSet = value === null ||
+        value === undefined ||
+        !`${value}`.trim();
+    if (isNotSet) {
         throw new Error(failMessage);
     }
 }
@@ -1725,4 +1729,40 @@ export async function run(
     }
 
     return runDotNetWith(args);
+}
+
+export async function restore(
+    opts: DotNetRestoreOptions
+): Promise<SystemResult> {
+    verifyExists(opts, `no options passed to restore`);
+    verifyNonEmptyString(opts.target, `target was not specified`);
+
+    const args = [ "restore", opts.target ];
+    pushFlag(args, opts.disableBuildServers, "--disable-build-servers");
+    pushIfSet(args, opts.source, "--source");
+    pushIfSet(args, opts.packages, "--packages");
+    pushFlag(args, opts.useCurrentRuntime, "--use-current-runtime");
+    pushFlag(args, opts.disableParallel, "--disable-parallel");
+    pushIfSet(args, opts.configFile, "--configfile");
+    pushFlag(args, opts.noHttpCache, "--no-http-cache");
+    pushFlag(args, opts.ignoreFailedSources, "--ignore-failed-sources");
+    pushFlag(args, opts.force, "--force");
+    pushIfSet(args, opts.runtime, "--runtime");
+    pushFlag(args, opts.noDependencies, "--no-dependencies");
+    pushIfSet(args, opts.verbosity, "--verbosity");
+    pushIfSet(args, opts.artifactsPath, "--artifacts-path");
+    pushFlag(args, opts.useLockFile, "--use-lock-file");
+    pushFlag(args, opts.lockedMode, "--locked-mode");
+    pushIfSet(args, opts.lockFilePath, "--lock-file-path");
+    pushFlag(args, opts.forceEvaluate, "--force-evaluate");
+    pushIfSet(args, opts.arch, "--arch");
+
+    return runDotNetWith(args);
+}
+
+async function verifyDotnet() {
+    const dotnet = await which("dotnet", { nothrow: true });
+    if (!dotnet) {
+        throw new Error(`dotnet: command not found in PATH`);
+    }
 }
