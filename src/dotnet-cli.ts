@@ -62,14 +62,16 @@ const emojiLabels = {
     packing: `📦 Packing`,
     building: `🏗️ Building`,
     cleaning: `🧹 Cleaning`,
-    publishing: `🚀 Publishing`
+    publishing: `🚀 Publishing`,
+    restoring: `🌐 Restoring`
 } as Dictionary<string>;
 const asciiLabels = {
     testing: `>>> Testing`,
     packing: `[_] Packing`,
     building: `+++ Building`,
     cleaning: `--- Cleaning`,
-    publishing: `*** Publishing`
+    publishing: `*** Publishing`,
+    restoring: `### Restoring`
 } as Dictionary<string>;
 const labels = resolveEnvFlag("NO_COLOR", false)
     ? asciiLabels
@@ -77,8 +79,41 @@ const labels = resolveEnvFlag("NO_COLOR", false)
 
 let defaultNugetSource: string;
 
+export interface Loggers {
+    log: (s: string) => void;
+    warn: (s: string) => void;
+}
+
+const loggers: Loggers = {
+    log(s: string) {
+        console.log(s);
+    },
+    warn(s: string) {
+        console.warn(s);
+    }
+};
+
+export function configureLoggers(customLoggers: Loggers) {
+    if (!customLoggers) {
+        throw new Error(`loggers is not set`);
+    }
+    if (!customLoggers.log) {
+        throw new Error(`loggers.log is not set`);
+    }
+    if (!customLoggers.warn) {
+        throw new Error(`loggers.warn is not set`);
+    }
+    loggers.log = customLoggers.log.bind(customLoggers);
+    loggers.warn = customLoggers.warn.bind(customLoggers);
+}
+
+export function resetLoggers() {
+    loggers.log = (s: string) => console.log(s);
+    loggers.warn = (s: string) => console.warn(s);
+}
+
 function showHeader(str: string) {
-    console.log(yellow(str));
+    loggers.log(yellow(str));
 }
 
 export async function listPackages(csproj: string): Promise<DotNetPackageReference[]> {
@@ -606,7 +641,7 @@ export async function pack(
                             version: await readNuspecVersion(absoluteNuspecPath)
                         };
 
-                        console.warn(`
+                        loggers.warn(`
 WARNING: 'dotnet pack' ignores --version-suffix when a nuspec file is provided.
           The version in '${copy.nuspec}' will be temporarily set to ${opts.versionSuffix} whilst
           packing and reverted later.
@@ -1101,13 +1136,13 @@ function hasMsbuildProperties(opts: any): opts is DotNetMsBuildOptions {
     return opts !== undefined && opts.msbuildProperties !== undefined;
 }
 
-function pushLoggers(args: string[], loggers: Optional<DotNetTestLoggers>) {
-    if (!loggers) {
+function pushLoggers(args: string[], dotnetTestLoggers: Optional<DotNetTestLoggers>) {
+    if (!dotnetTestLoggers) {
         return;
     }
-    for (const loggerName of Object.keys(loggers)) {
+    for (const loggerName of Object.keys(dotnetTestLoggers)) {
         const toBuild = [ loggerName ];
-        const options = loggers[loggerName];
+        const options = dotnetTestLoggers[loggerName];
         for (const key of Object.keys(options || {})) {
             const value = options[key];
             toBuild.push([ key, value ].join("="));
@@ -1557,7 +1592,7 @@ export async function upgradePackages(
         }
         if (toUpgrade.length === 0) {
             if (opts.showProgress) {
-                console.log(`  -> no matching packages to upgrade in '${project}'`);
+                loggers.log(`  -> no matching packages to upgrade in '${project}'`);
             }
             continue;
         }
@@ -1576,7 +1611,7 @@ export async function upgradePackages(
             )
         ) as PackageInfo[];
         if (upstream.length === 0) {
-            console.warn(`No results found for packages at ${opts.source} (preRelease: ${!!opts.preRelease})\n- ${upgradeIds.join(
+            loggers.warn(`No results found for packages at ${opts.source} (preRelease: ${!!opts.preRelease})\n- ${upgradeIds.join(
                 "\n- ")}`);
         }
         for (const pkg of upstream) {
@@ -1586,7 +1621,7 @@ export async function upgradePackages(
             }
             if (pkg.version.equals(projectMatch.version)) {
                 if (opts.showProgress) {
-                    console.log(`  ${pkg.id} already at latest version '${pkg.version}' in '${project}'`);
+                    loggers.log(`  ${pkg.id} already at latest version '${pkg.version}' in '${project}'`);
                 }
                 continue;
             }
@@ -1687,7 +1722,7 @@ export async function clearCaches(
             }
         }
     }
-    console.warn(`unable to clear caches:\n${lastError}`);
+    loggers.warn(`unable to clear caches:\n${lastError}`);
 }
 
 export async function run(
@@ -1736,6 +1771,9 @@ export async function restore(
 ): Promise<SystemResult> {
     verifyExists(opts, `no options passed to restore`);
     verifyNonEmptyString(opts.target, `target was not specified`);
+
+    const label = generateLabel("restoring");
+    showHeader(`${label} ${q(opts.target)} ${detailedInfoFor(opts)}`);
 
     const args = [ "restore", opts.target ];
     pushFlag(args, opts.disableBuildServers, "--disable-build-servers");

@@ -2,16 +2,17 @@ import "expect-even-more-jest";
 import * as realSystem from "system-wrapper";
 
 const systemMock = { ...realSystem, system: jest.fn() };
-const originalSystemFn = realSystem.system;
 jest.doMock("system-wrapper", () => {
     return systemMock;
 });
 import { restore } from "../src";
 import { Dictionary, SystemResult } from "system-wrapper";
 import { faker } from "@faker-js/faker";
+import { noop } from "./common";
 
 describe(`dotnet-cli:restore`, () => {
-    const { anything } = expect;
+    const { spyOn } = jest;
+    const { anything, stringContaining } = expect;
     it(`should be exported as a function`, async () => {
         // Arrange
         // Act
@@ -47,6 +48,10 @@ describe(`dotnet-cli:restore`, () => {
                 "dotnet",
                 [ "restore", target ],
                 anything()
+            );
+        expect(console.log)
+            .toHaveBeenCalledOnceWith(
+                stringContaining("Restoring")
             );
     });
 
@@ -407,6 +412,7 @@ describe(`dotnet-cli:restore`, () => {
     });
 
     beforeEach(() => {
+        spyOn(console, "log").mockImplementation(noop);
         mockSystem();
     });
 

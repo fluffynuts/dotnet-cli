@@ -42,6 +42,14 @@ listProjects(solutionFile: string): Promise<string[]>;
 upgradePackages(opts: DotNetUpgradePackagesOptions): Promise<void>;
 clearCaches(cacheType: DotNetCache | string): Promise<void>;
 run(opts: DotNetRunProjectOptions): Promise<SystemResult>;
+restore(opts: DotNetRestoreOptions): Promise<SystemResult>
+
+// also:
+// provide custom logger functions (log and warn) to capture logs
+//    instead of outputting them
+configureLoggers(customLoggers: Loggers);
+// reset to default loggers (console.log, console.warn)
+resetLoggers();
 ```
 
 Examples:
