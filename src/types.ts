@@ -113,6 +113,7 @@ export interface DotNetRestoreOptions {
     lockFilePath?: string;
     forceEvaluate?: boolean;
     arch?: string;
+    msbuildProperties?: Dictionary<string>;
 }
 
 export interface DotNetNugetPushOptions

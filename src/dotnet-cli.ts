@@ -1071,7 +1071,7 @@ async function runDotNetWith(
 
 function pushMsbuildProperties(
     args: string[],
-    opts: DotNetMsBuildOptions | Dictionary<string>
+    opts: DotNetMsBuildOptions
 ) {
     if (!opts.msbuildProperties) {
         return;
@@ -1756,6 +1756,9 @@ export async function restore(
     pushIfSet(args, opts.lockFilePath, "--lock-file-path");
     pushFlag(args, opts.forceEvaluate, "--force-evaluate");
     pushIfSet(args, opts.arch, "--arch");
+    if (opts.msbuildProperties) {
+        pushMsbuildProperties(args, opts);
+    }
 
     return runDotNetWith(args);
 }

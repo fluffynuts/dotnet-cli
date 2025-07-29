@@ -7,7 +7,7 @@ jest.doMock("system-wrapper", () => {
     return systemMock;
 });
 import { restore } from "../src";
-import { SystemResult } from "system-wrapper";
+import { Dictionary, SystemResult } from "system-wrapper";
 import { faker } from "@faker-js/faker";
 
 describe(`dotnet-cli:restore`, () => {
@@ -376,6 +376,32 @@ describe(`dotnet-cli:restore`, () => {
             .toHaveBeenCalledOnceWith(
                 "dotnet",
                 [ "restore", target, "--arch", expected ],
+                anything()
+            );
+    });
+
+    it(`should add msbuild properties`, async () => {
+        // Arrange
+        const
+            target = faker.word.sample(),
+            msbuildProperties: Dictionary<string> = {},
+            propName = faker.word.sample(),
+            propValue = faker.word.sample(),
+            expectedArgs = [
+                "restore", target,
+                `-p:${propName}=${propValue}`
+            ];
+        msbuildProperties[propName] = propValue;
+        // Act
+        await restore({
+            target,
+            msbuildProperties
+        });
+        // Assert
+        expect(systemMock.system)
+            .toHaveBeenCalledOnceWith(
+                "dotnet",
+                expectedArgs,
                 anything()
             );
     });
