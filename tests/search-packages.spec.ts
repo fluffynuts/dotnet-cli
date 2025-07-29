@@ -61,7 +61,6 @@ describe(`searchPackages`, () => {
             }
         }
         // Assert
-        console.log(result);
         expect(result.length)
             .toEqual(1);
 
