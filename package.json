@@ -1,6 +1,6 @@
 {
   "name": "dotnet-cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
   "scripts": {
     "test": "jest",
@@ -51,6 +51,6 @@
   "dependencies": {
     "debug": "^4.4.1",
     "exec-step": "^0.17.0",
-    "system-wrapper": "^1.6.0"
+    "system-wrapper": "^1.7.0"
   }
 }
