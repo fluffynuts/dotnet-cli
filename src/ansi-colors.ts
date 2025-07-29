@@ -3,11 +3,15 @@ import ansiColors from "ansi-colors";
 export function yellow(message: string) {
     return isSuppressed()
         ? noColor(message)
-        : ansiColors.yellow(message);
+        : alwaysYellow(message);
 }
 
-export function noColor(...args: any[]) {
-    console.log(args);
+export function alwaysYellow(message: string) {
+    return ansiColors.yellow(message);
+}
+
+export function noColor(message: string) {
+    return message;
 }
 
 function isSuppressed() {
