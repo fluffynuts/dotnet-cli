@@ -37,18 +37,18 @@ describe(`searchPackages`, () => {
         // Arrange
         const availableSources = await listNugetSources();
         const githubSource = availableSources.find(
-            o => o.name === "github-codeo"
+            o => o.name === "github-fluffynuts"
         );
         if (!githubSource) {
-            console.warn(`Unable to test github access: no local source with the name 'github-codeo'`);
+            console.warn(`Unable to test github access: no local source with the name 'github-fluffynuts'`);
             return;
         }
         // Act
         let result: PackageInfo[] = [];
         try {
             result = await searchPackages({
-                source: "github-codeo",
-                search: "Codeo.Core",
+                source: "github-fluffynuts",
+                search: "PeanutButter.INI",
                 preRelease: true,
                 exactMatch: true,
                 take: 1
