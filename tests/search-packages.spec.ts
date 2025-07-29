@@ -48,7 +48,7 @@ describe(`searchPackages`, () => {
         try {
             result = await searchPackages({
                 source: "github-fluffynuts",
-                search: "PeanutButter.INI",
+                search: "peanutbutter.ini",
                 preRelease: true,
                 exactMatch: true,
                 take: 1
@@ -61,6 +61,7 @@ describe(`searchPackages`, () => {
             }
         }
         // Assert
+        console.log(result);
         expect(result.length)
             .toEqual(1);
 
