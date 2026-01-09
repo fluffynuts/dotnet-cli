@@ -280,6 +280,7 @@ export interface DotNetMsBuildOptions
     additionalArguments?: string[];
 
     env?: Dictionary<string>;
+    lowPriority?: boolean;
 }
 
 export interface PackageInfo {

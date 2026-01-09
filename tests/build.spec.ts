@@ -77,6 +77,24 @@ describe(`dotnet-cli:build`, () => {
             );
     });
 
+    it(`should pass -low when configured to do so`, async () => {
+        // Arrange
+        const
+            target = faker.word.sample(),
+            lowPriority = true;
+        // Act
+        await build({
+            target,
+            lowPriority
+        });
+        // Assert
+        expect(system)
+            .toHaveBeenCalledOnceWith(
+                "dotnet", [ "build", target, "--low" ],
+                anything
+            );
+    });
+
     it(`should use the provided framework`, async () => {
         // Arrange
         const

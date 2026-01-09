@@ -981,7 +981,7 @@ function pushConfiguration(
 
 function pushCommonBuildArgs(
     args: string[],
-    opts: DotNetTestOptions,
+    opts: DotNetCommonBuildOptions,
     configuration: string
 ) {
     pushVerbosity(args, opts);
@@ -992,6 +992,14 @@ function pushCommonBuildArgs(
     pushArch(args, opts);
     pushOperatingSystem(args, opts);
     pushOutput(args, opts);
+    pushLowPriority(args, opts);
+}
+
+function pushLowPriority(args: string[], opts: DotNetCommonBuildOptions) {
+    if (!opts.lowPriority) {
+        return;
+    }
+    args.push("--low");
 }
 
 function pushTerminalLogger(args: string[], opts: DotNetCommonBuildOptions) {
