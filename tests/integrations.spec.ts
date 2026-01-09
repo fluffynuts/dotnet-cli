@@ -25,7 +25,7 @@ import type { NugetAddSourceOptions, NugetSource } from "../src/types";
 
 if (shouldSkipSlowNetworkTests()) {
     describe(`dotnet-cli`, () => {
-        it(`skipping tests`, async () => {
+        it(`skipping slow network-bound tests`, async () => {
             // Arrange
             // Act
             expect(true).toBeTrue();
