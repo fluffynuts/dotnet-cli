@@ -19,7 +19,7 @@ import {
     removeNugetSource,
     disableNugetSource,
     tryFindConfiguredNugetSource,
-    incrementTempDbPortHintIfFound
+    incrementTempDbPortHintIfFound, create, build
 } from "../src";
 import type { NugetAddSourceOptions, NugetSource } from "../src/types";
 
@@ -499,6 +499,27 @@ if (shouldSkipSlowNetworkTests()) {
                         expect(parseInt(second, 10))
                             .toEqual(start + 1);
                     });
+                });
+            });
+        });
+
+        describe(`basic build`, () => {
+            it(`should build`, async () => {
+                // Arrange
+                const
+                    sandbox = await Sandbox.create();
+                await sandbox.run(async () => {
+                    await create({
+                        template: "console",
+                        name: "BasicBuild"
+                    });
+                    // Act
+                    await expect(async () => await build({
+                        target: "BasicBuild.csproj",
+                        lowPriority: true,
+                        maxCPUs: 1
+                    })).not.toBeRejected();
+                    // Assert
                 });
             });
         });

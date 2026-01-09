@@ -95,6 +95,24 @@ describe(`dotnet-cli:build`, () => {
             );
     });
 
+    it(`should set max cpus when when configured to do so`, async () => {
+        // Arrange
+        const
+            target = faker.word.sample(),
+            maxCPUs = faker.number.int({ min: 1, max: 5 });
+        // Act
+        await build({
+            target,
+            maxCPUs
+        });
+        // Assert
+        expect(system)
+            .toHaveBeenCalledOnceWith(
+                "dotnet", [ "build", target, `-m:${maxCPUs}` ],
+                anything
+            );
+    });
+
     it(`should use the provided framework`, async () => {
         // Arrange
         const

@@ -32,7 +32,9 @@ import type {
     DotNetBaseOptions,
     DotNetBuildOptions,
     DotNetCleanOptions,
-    DotNetCommonBuildOptions, DotNetCreateOptions, DotNetInstallNugetPackageOptions,
+    DotNetCommonBuildOptions,
+    DotNetCreateOptions,
+    DotNetInstallNugetPackageOptions,
     DotNetMsBuildOptions,
     DotNetMsBuildOptionsWithTargetAndConfigurations,
     DotNetNugetPushOptions,
@@ -993,6 +995,23 @@ function pushCommonBuildArgs(
     pushOperatingSystem(args, opts);
     pushOutput(args, opts);
     pushLowPriority(args, opts);
+    pushMaxCPUs(args, opts);
+}
+
+function pushMaxCPUs(args: string[], opts: DotNetCommonBuildOptions) {
+    if (opts.maxCPUs === undefined || opts.maxCPUs === null) {
+        return;
+    }
+    const maxCPUs = `${opts.maxCPUs}`;
+    const configuredValue = parseInt(maxCPUs, 10);
+    if (isNaN(configuredValue)) {
+        return;
+    }
+    if (configuredValue < 1) {
+        debug(`max cpus set < 1; letting dotnet decide`);
+        return;
+    }
+    args.push(`-m:${configuredValue}`);
 }
 
 function pushLowPriority(args: string[], opts: DotNetCommonBuildOptions) {

@@ -281,6 +281,7 @@ export interface DotNetMsBuildOptions
 
     env?: Dictionary<string>;
     lowPriority?: boolean;
+    maxCPUs?: number;
 }
 
 export interface PackageInfo {
